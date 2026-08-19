@@ -1,5 +1,6 @@
 /** The shared HTTP engine: retries, error mapping, and the x402 402→pay→retry loop. */
 import {
+  AnonymousAuth,
   ApiKeyAuth,
   EvmX402Auth,
   SolanaX402Auth,
@@ -41,6 +42,15 @@ export interface ClientOptions {
    * A client-side circuit breaker, not a budget. Defaults to 100 USDC.
    */
   maxAmountBaseUnits?: bigint
+  /**
+   * Proceed with no credential instead of throwing when none is found.
+   *
+   * Sends no auth header at all, which is what reaches the gateway's free tier and
+   * public catalogue — a placeholder key would be rejected with 401. Paid endpoints
+   * still answer 402. Use this for read-only browsing and free-model calls before a
+   * user has logged in.
+   */
+  allowAnonymous?: boolean
   /** Injectable for tests. */
   fetchImpl?: typeof fetch
 }
@@ -116,6 +126,11 @@ export class BaseClient {
   /** Whether this client can pay for calls itself. */
   get canPay(): boolean {
     return this.auth.supportsX402
+  }
+
+  /** True when no credential is attached: free endpoints only. */
+  get isAnonymous(): boolean {
+    return this.auth instanceof AnonymousAuth
   }
 
   // ─── Requests ─────────────────────────────────────────────────────────────
@@ -278,6 +293,15 @@ export class BaseClient {
    * actually spendable by the lifetime deposit total.
    */
   async getBalanceUsd(): Promise<number> {
+    if (this.isAnonymous) {
+      // There is no account and no wallet to read. Returning 0 here would be
+      // indistinguishable from an empty wallet and would send someone to top up
+      // an account they do not have.
+      throw new JarvisClawError(
+        'No credential, so there is no balance to read. Add an API key or a wallet ' +
+          'key to see one; free models need neither.',
+      )
+    }
     const address = this.auth.address
     if (address) {
       return this.auth instanceof SolanaX402Auth
@@ -340,10 +364,12 @@ async function resolveAuth(opts: ClientOptions, baseUrl: string): Promise<AuthSt
   if (opts.privateKey) return walletAuth(opts.privateKey, opts, baseUrl, limits)
   if (apiKey) return new ApiKeyAuth(apiKey)
   if (privateKey) return walletAuth(privateKey, opts, baseUrl, limits)
+  if (opts.allowAnonymous) return new AnonymousAuth()
 
   throw new JarvisClawError(
     'No credential. Pass apiKey or privateKey, or set JARVISCLAW_API_KEY ' +
-      'or JARVISCLAW_WALLET_KEY in the environment.',
+      'or JARVISCLAW_WALLET_KEY in the environment. Pass allowAnonymous to ' +
+      'browse and use free models without one.',
   )
 }
 

@@ -21,6 +21,7 @@ export {
 } from './client.js'
 
 export {
+  AnonymousAuth,
   ApiKeyAuth,
   EvmX402Auth,
   SolanaX402Auth,

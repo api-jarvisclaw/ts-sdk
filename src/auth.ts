@@ -49,6 +49,31 @@ export interface AuthStrategy {
   signPayment(resp: Response, resourceUrl: string): Promise<string | undefined>
 }
 
+/**
+ * No credential at all — sends nothing and cannot pay.
+ *
+ * Not the same as a placeholder key. The gateway rejects any credential it does
+ * not recognise with 401, so a stand-in like `Bearer anonymous` fails where sending
+ * no header succeeds: the free tier and the public catalogue are reachable only by
+ * an genuinely credential-less request. This makes that reachable deliberately,
+ * instead of by passing a fake key and hoping it is ignored.
+ *
+ * A paid endpoint still answers 402, which surfaces as InsufficientBalanceError
+ * explaining that no wallet is configured.
+ */
+export class AnonymousAuth implements AuthStrategy {
+  readonly supportsX402 = false
+  readonly address = undefined
+
+  prepareHeaders(): void {
+    // Deliberately nothing.
+  }
+
+  async signPayment(): Promise<undefined> {
+    return undefined
+  }
+}
+
 /** Bearer-token authentication with a gateway API key. */
 export class ApiKeyAuth implements AuthStrategy {
   readonly supportsX402 = false
