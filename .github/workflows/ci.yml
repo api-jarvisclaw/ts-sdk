@@ -52,7 +52,12 @@ jobs:
           node-version: '20'
 
       - name: Install Python signing deps
-        run: pip install 'eth-account>=0.10' 'solders>=0.21' 'base58>=2.1'
+        # `requests` is needed even though nothing here makes an HTTP call:
+        # importing jarvisclaw.x402 executes the package __init__, which pulls in
+        # the HTTP client. Installing the package itself would be the tidier fix but
+        # would also test whatever extras resolution does that day rather than the
+        # signing code.
+        run: pip install 'eth-account>=0.10' 'solders>=0.21' 'base58>=2.1' 'requests>=2.28'
 
       - name: Regenerate the reference fixture
         working-directory: ts-sdk
