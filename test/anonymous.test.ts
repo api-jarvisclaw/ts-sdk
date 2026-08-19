@@ -111,3 +111,18 @@ describe('anonymous mode', () => {
     expect([...headers.keys()]).toEqual(['content-type'])
   })
 })
+
+describe('every AuthStrategy accepts the headers it is passed', () => {
+  it('declares the parameter even when it ignores it', async () => {
+    // A zero-arity prepareHeaders satisfies the interface but rejects
+    // `prepareHeaders(h)` at the call site — the typecheck failure that got past a
+    // local run because the test was written after it. Checking arity here means
+    // the same slip fails a test rather than only the build.
+    const { AnonymousAuth, ApiKeyAuth, EvmX402Auth, SolanaX402Auth } = await import(
+      '../src/auth.js'
+    )
+    for (const ctor of [AnonymousAuth, ApiKeyAuth, EvmX402Auth, SolanaX402Auth]) {
+      expect(ctor.prototype.prepareHeaders.length).toBe(1)
+    }
+  })
+})

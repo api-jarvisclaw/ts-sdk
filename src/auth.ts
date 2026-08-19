@@ -65,8 +65,11 @@ export class AnonymousAuth implements AuthStrategy {
   readonly supportsX402 = false
   readonly address = undefined
 
-  prepareHeaders(): void {
-    // Deliberately nothing.
+  // Takes the parameter it ignores, so a caller passing headers typechecks. A
+  // zero-arity signature satisfies the interface but rejects `prepareHeaders(h)`
+  // at the call site.
+  prepareHeaders(_headers: Headers): void {
+    // Deliberately adds nothing: no header is what reaches the free tier.
   }
 
   async signPayment(): Promise<undefined> {
@@ -107,9 +110,10 @@ export class EvmX402Auth implements AuthStrategy {
     return this.signer.address
   }
 
-  prepareHeaders(): void {
+  prepareHeaders(_headers: Headers): void {
     // Nothing to add: the wallet proves itself by signing the 402 challenge, so
-    // an unpaid first request is deliberately anonymous.
+    // an unpaid first request is deliberately anonymous. The parameter is taken
+    // rather than omitted so a caller passing headers typechecks.
   }
 
   async signPayment(resp: Response, resourceUrl: string): Promise<string> {
@@ -134,7 +138,7 @@ export class SolanaX402Auth implements AuthStrategy {
     return this.signer.address
   }
 
-  prepareHeaders(): void {
+  prepareHeaders(_headers: Headers): void {
     // See EvmX402Auth.prepareHeaders.
   }
 
