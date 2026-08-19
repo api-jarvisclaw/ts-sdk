@@ -46,10 +46,23 @@ jobs:
           fi
           echo "publishing $PKG"
 
+      - name: Check the npm credential is present
+        # An absent secret is an empty string, not an error, so npm publish would
+        # fail as a confusing 401/ENEEDAUTH rather than saying what is missing.
+        # Only the length is printed — never the value.
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMSECRET }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::the NPMSECRET repository secret is empty or unset — set it with: gh secret set NPMSECRET --repo api-jarvisclaw/ts-sdk"
+            exit 1
+          fi
+          echo "npm credential present (${#NODE_AUTH_TOKEN} chars)"
+
       - name: Publish
         # --access public is required for the first publish of a scoped package:
         # npm defaults a new @scope/name to restricted and fails without a paid
         # plan. It is a no-op once the package is public.
         run: npm publish --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPMSECRET }}
