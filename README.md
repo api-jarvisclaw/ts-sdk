@@ -1,4 +1,4 @@
-# @jarvisclaw/sdk
+# @jarvisclaw-ai/sdk
 
 TypeScript SDK for the [JarvisClaw](https://jarvisclaw.ai) AI gateway, with x402
 USDC payments built in on Base and Solana.
@@ -13,7 +13,7 @@ Sibling SDKs: [python-sdk](https://github.com/api-jarvisclaw/python-sdk) ·
 ## Install
 
 ```bash
-npm install @jarvisclaw/sdk
+npm install @jarvisclaw-ai/sdk
 ```
 
 The chain libraries are optional peers — install only the one you need:
@@ -28,7 +28,7 @@ Neither is needed in API-key mode.
 ## Two ways to pay
 
 ```ts
-import { BaseClient } from '@jarvisclaw/sdk'
+import { BaseClient } from '@jarvisclaw-ai/sdk'
 
 // 1. API key — the account's balance covers the call.
 const client = await BaseClient.create({ apiKey: 'sk-...' })
@@ -98,7 +98,7 @@ import {
   APIError, AuthenticationError, ConnectionError,
   InsufficientBalanceError, JarvisClawError, PaymentError,
   RateLimitError, TimeoutError,
-} from '@jarvisclaw/sdk'
+} from '@jarvisclaw-ai/sdk'
 ```
 
 | error | when |
@@ -122,7 +122,7 @@ The signers are exported for use without the client — for a proxy, a facilitat
 test, or another HTTP stack:
 
 ```ts
-import { EvmX402Signer, SolanaX402Signer } from '@jarvisclaw/sdk'
+import { EvmX402Signer, SolanaX402Signer } from '@jarvisclaw-ai/sdk'
 
 const signer = await EvmX402Signer.fromPrivateKey('0x...')
 const header = await signer.signFrom402(response402, requestUrl)

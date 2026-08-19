@@ -1,5 +1,5 @@
 /**
- * `@jarvisclaw/sdk` — TypeScript client for the JarvisClaw gateway.
+ * `@jarvisclaw-ai/sdk` — TypeScript client for the JarvisClaw gateway.
  *
  * Two ways to authenticate, both through the same clients:
  *
