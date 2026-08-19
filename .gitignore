@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+coverage/
+bun.lock
+bun.lockb
+package-lock.json

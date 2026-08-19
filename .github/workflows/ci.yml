@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  cross-impl:
+    # The signing fixtures come from the Python SDK, so a drift between the two
+    # would otherwise only show up when the facilitator rejected a real payment.
+    # Regenerating them here proves the checked-in fixture still matches what the
+    # Python implementation produces today.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ts-sdk
+
+      - uses: actions/checkout@v4
+        with:
+          repository: api-jarvisclaw/python-sdk
+          path: python-sdk
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python signing deps
+        run: pip install 'eth-account>=0.10' 'solders>=0.21' 'base58>=2.1'
+
+      - name: Regenerate the reference fixture
+        working-directory: ts-sdk
+        run: python test/fixtures/generate_reference.py > /tmp/regenerated.json
+
+      - name: Compare against the checked-in fixture
+        working-directory: ts-sdk
+        run: |
+          if ! diff -u test/fixtures/reference.json /tmp/regenerated.json; then
+            echo "::error::The Python SDK now produces different x402 envelopes than the checked-in fixture. One of the two implementations changed; reconcile them before merging."
+            exit 1
+          fi
+
+      - name: Install
+        working-directory: ts-sdk
+        run: npm install
+
+      - name: Test against the freshly generated fixture
+        working-directory: ts-sdk
+        run: npm test

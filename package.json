@@ -1,0 +1,74 @@
+{
+  "name": "@jarvisclaw/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for JarvisClaw — chat, marketplace and AIP, with built-in x402 USDC payments on Base and Solana.",
+  "license": "MIT",
+  "author": "JarvisClaw",
+  "homepage": "https://jarvisclaw.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/api-jarvisclaw/ts-sdk.git"
+  },
+  "bugs": "https://github.com/api-jarvisclaw/ts-sdk/issues",
+  "keywords": [
+    "jarvisclaw",
+    "x402",
+    "usdc",
+    "ai",
+    "llm",
+    "agent",
+    "micropayments",
+    "base",
+    "solana",
+    "openai-compatible"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "bs58": "6.0.0"
+  },
+  "peerDependencies": {
+    "@solana/web3.js": "^1.95.0",
+    "viem": "^2.21.0"
+  },
+  "peerDependenciesMeta": {
+    "viem": {
+      "optional": true
+    },
+    "@solana/web3.js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@solana/web3.js": "1.98.4",
+    "@types/node": "22.10.2",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "viem": "2.55.19",
+    "vitest": "2.1.8"
+  }
+}

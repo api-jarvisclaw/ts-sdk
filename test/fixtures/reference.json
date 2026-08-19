@@ -1,0 +1,113 @@
+{
+  "_generatedBy": "python-sdk via test/fixtures/generate_reference.py",
+  "evmTestKey": "0x1111111111111111111111111111111111111111111111111111111111111111",
+  "fixedNonceHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "fixedMemoHex": "000102030405060708090a0b0c0d0e0f",
+  "fixedTimeSeconds": 1700000000,
+  "resourceUrl": "https://api.jarvisclaw.ai/v1/chat/completions",
+  "challengeEvm": {
+    "x402Version": 2,
+    "accepts": [
+      {
+        "scheme": "exact",
+        "network": "eip155:8453",
+        "amount": "12345",
+        "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "payTo": "0x2222222222222222222222222222222222222222",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "name": "USD Coin",
+          "version": "2"
+        }
+      }
+    ],
+    "resource": {
+      "description": "chat completion"
+    }
+  },
+  "challengeSolana": {
+    "x402Version": 2,
+    "accepts": [
+      {
+        "scheme": "exact",
+        "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+        "amount": "45678",
+        "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "payTo": "3nLpqvJ6vLZ3sK4CvJ5v4qxA1JzRfLbYwGzT8pQ2xVwR",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "feePayer": "GkPqrQZBqDkSxWyEuJmPuNVMPhVUcvRcqiTfEUwmw3rW"
+        }
+      }
+    ],
+    "resource": {
+      "description": "chat completion"
+    }
+  },
+  "evm": {
+    "address": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
+    "header": "eyJ4NDAyVmVyc2lvbiI6MiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuamFydmlzY2xhdy5haS92MS9jaGF0L2NvbXBsZXRpb25zIiwiZGVzY3JpcHRpb24iOiJjaGF0IGNvbXBsZXRpb24iLCJtaW1lVHlwZSI6ImFwcGxpY2F0aW9uL2pzb24ifSwiYWNjZXB0ZWQiOnsic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1Ojg0NTMiLCJhbW91bnQiOiIxMjM0NSIsImFzc2V0IjoiMHg4MzM1ODlmQ0Q2ZURiNkUwOGY0YzdDMzJENGY3MWI1NGJkQTAyOTEzIiwicGF5VG8iOiIweDIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEIENvaW4iLCJ2ZXJzaW9uIjoiMiJ9fSwicGF5bG9hZCI6eyJzaWduYXR1cmUiOiIweDM4NzM4ZWE1ZDI2MDU1N2M3M2JjOWJlYTMyNTIxMmZjYjllOGNkMDI0ZTI2MTJmNzVhOTFkZjQxYWI2YWJjNmUwZjExY2NjMGMxMjZiNzRhZTY1NDczNTMwNjQ2MTE3YzcxZDJhNjZmOWExMWNlYjBkNmU0ZDVmY2Q5MTcyNDQwMWMiLCJhdXRob3JpemF0aW9uIjp7ImZyb20iOiIweDE5RTdFMzc2RTdDMjEzQjdFN2U3ZTQ2Y2M3MEE1ZEQwODZEQWZmMkEiLCJ0byI6IjB4MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMiIsInZhbHVlIjoiMTIzNDUiLCJ2YWxpZEFmdGVyIjoiMTY5OTk5OTQwMCIsInZhbGlkQmVmb3JlIjoiMTcwMDAwMDMwMCIsIm5vbmNlIjoiMHgwMDAxMDIwMzA0MDUwNjA3MDgwOTBhMGIwYzBkMGUwZjEwMTExMjEzMTQxNTE2MTcxODE5MWExYjFjMWQxZTFmIn19LCJleHRlbnNpb25zIjp7fX0=",
+    "envelope": {
+      "x402Version": 2,
+      "resource": {
+        "url": "https://api.jarvisclaw.ai/v1/chat/completions",
+        "description": "chat completion",
+        "mimeType": "application/json"
+      },
+      "accepted": {
+        "scheme": "exact",
+        "network": "eip155:8453",
+        "amount": "12345",
+        "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "payTo": "0x2222222222222222222222222222222222222222",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "name": "USD Coin",
+          "version": "2"
+        }
+      },
+      "payload": {
+        "signature": "0x38738ea5d260557c73bc9bea325212fcb9e8cd024e2612f75a91df41ab6abc6e0f11ccc0c126b74ae65473530646117c71d2a66f9a11ceb0d6e4d5fcd91724401c",
+        "authorization": {
+          "from": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
+          "to": "0x2222222222222222222222222222222222222222",
+          "value": "12345",
+          "validAfter": "1699999400",
+          "validBefore": "1700000300",
+          "nonce": "0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+        }
+      },
+      "extensions": {}
+    }
+  },
+  "solana": {
+    "address": "Bow1CGKGDB9mNxeWdw85E2aCthQ1oZX4oFEe7fYT17ew",
+    "seedHex": "2222222222222222222222222222222222222222222222222222222222222222",
+    "keyBase58": "3JF3sEqM796hk5WFqA6EtmEwJQ9quALszsfJyvXNQKy3",
+    "blockhash": "9zjKrPcvz9CQBHDeqNLuUYbFRcRDjs4jNM7GwSQtqPUZ",
+    "header": "eyJ4NDAyVmVyc2lvbiI6MiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuamFydmlzY2xhdy5haS92MS9jaGF0L2NvbXBsZXRpb25zIiwiZGVzY3JpcHRpb24iOiJjaGF0IGNvbXBsZXRpb24iLCJtaW1lVHlwZSI6ImFwcGxpY2F0aW9uL2pzb24ifSwiYWNjZXB0ZWQiOnsic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoic29sYW5hOjVleWt0NFVzRnY4UDhOSmRUUkVwWTF2enFLcVpLdmRwIiwiYW1vdW50IjoiNDU2NzgiLCJhc3NldCI6IkVQakZXZGQ1QXVmcVNTcWVNMnFOMXh6eWJhcEM4RzR3RUdHa1p3eVREdDF2IiwicGF5VG8iOiIzbkxwcXZKNnZMWjNzSzRDdko1djRxeEExSnpSZkxiWXdHelQ4cFEyeFZ3UiIsIm1heFRpbWVvdXRTZWNvbmRzIjozMDAsImV4dHJhIjp7ImZlZVBheWVyIjoiR2tQcXJRWkJxRGtTeFd5RXVKbVB1TlZNUGhWVWN2UmNxaVRmRVV3bXczclcifX0sInBheWxvYWQiOnsidHJhbnNhY3Rpb24iOiJBZ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUNmTHlKYUljVzE0emdIbXZDU1VWTWZkSkQ2U1lKQ05ja1ltaVJWWXFpdTZ3WUJEZXVsMkVWQWhTdml4WW82cWdoUTNMdnlpZWFkTDZ3akg2czUzNDhCZ0FJQkJBanAvUnRGUnk2SE1VTmxDSUl1V0tnU0VWdUtoYUpuY0tyT0JZZ094QU9ucjZDYXBmUjZaMW1BTC9sVitOd3RLaFNseVowanZwZjRaQkovK1RnMFZhVHdJKzFTeXdldFg0c3pVMDZmVHNTYmV0bVVpSGh4UkRSRzJGZUFMbFIra0toRkY1a3ZWU25jWTF6K1VCL2VESlhHQkZWT2NnTnUya2I3QUp6Nm42enZ4UU1HUm0vbElSY3kvK3l0dW5MRG0rZThqT1c3eGZjU2F5eERtenBBQUFBQUJVcFRXcGtwSVFaTkpPaHhZTm80Zkh3MXRkMjhrcnVCNUIrb1FFRUZSSTBHM2ZiaDEyV2hrOW5MNFViTzYzbXNITFNGN1Y5Yk41RTZqUFdGZnY4QXFjYjZldk8rMjYwNlBXWHphcXZKZERHeHUrVEMwdmJnNUh5bUFnTkZMMTFoaGFkMVpnemovTWdCTE1VSzQvZ1hwOEJ1RjdrY1VZcFVvb3Vqa3lKdWNLWUVCQUFGQWtBTkF3QUVBQWtERUNjQUFBQUFBQUFHQkFJSEF3RUtERzZ5QUFBQUFBQUFCZ1VBSURBd01ERXdNakF6TURRd05UQTJNRGN3T0RBNU1HRXdZakJqTUdRd1pUQm1BQT09In0sImV4dGVuc2lvbnMiOnt9fQ==",
+    "envelope": {
+      "x402Version": 2,
+      "resource": {
+        "url": "https://api.jarvisclaw.ai/v1/chat/completions",
+        "description": "chat completion",
+        "mimeType": "application/json"
+      },
+      "accepted": {
+        "scheme": "exact",
+        "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+        "amount": "45678",
+        "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "payTo": "3nLpqvJ6vLZ3sK4CvJ5v4qxA1JzRfLbYwGzT8pQ2xVwR",
+        "maxTimeoutSeconds": 300,
+        "extra": {
+          "feePayer": "GkPqrQZBqDkSxWyEuJmPuNVMPhVUcvRcqiTfEUwmw3rW"
+        }
+      },
+      "payload": {
+        "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACfLyJaIcW14zgHmvCSUVMfdJD6SYJCNckYmiRVYqiu6wYBDeul2EVAhSvixYo6qghQ3LvyieadL6wjH6s5348BgAIBBAjp/RtFRy6HMUNlCIIuWKgSEVuKhaJncKrOBYgOxAOnr6CapfR6Z1mAL/lV+NwtKhSlyZ0jvpf4ZBJ/+Tg0VaTwI+1SywetX4szU06fTsSbetmUiHhxRDRG2FeALlR+kKhFF5kvVSncY1z+UB/eDJXGBFVOcgNu2kb7AJz6n6zvxQMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAABUpTWpkpIQZNJOhxYNo4fHw1td28kruB5B+oQEEFRI0G3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8Aqcb6evO+2606PWXzaqvJdDGxu+TC0vbg5HymAgNFL11hhad1Zgzj/MgBLMUK4/gXp8BuF7kcUYpUooujkyJucKYEBAAFAkANAwAEAAkDECcAAAAAAAAGBAIHAwEKDG6yAAAAAAAABgUAIDAwMDEwMjAzMDQwNTA2MDcwODA5MGEwYjBjMGQwZTBmAA=="
+      },
+      "extensions": {}
+    }
+  }
+}
