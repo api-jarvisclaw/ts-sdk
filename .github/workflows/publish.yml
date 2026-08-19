@@ -1,0 +1,55 @@
+name: Publish to npm
+
+# Tag-driven, matching python-sdk's release flow: `git tag v0.1.0 && git push --tags`.
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for npm trusted publishing (OIDC). Harmless while still using a
+      # token, so the workflow does not need editing when you switch over.
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install
+        run: npm install
+
+      - name: Verify before publishing
+        # A broken publish cannot be unpublished after 72 hours, and a version
+        # number can never be reused. Everything is checked here rather than
+        # trusting that CI passed on some earlier commit.
+        run: |
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Check the tag matches package.json
+        # A tag of v0.2.0 on a package.json still saying 0.1.0 either republishes
+        # 0.1.0 (rejected) or silently ships the wrong version under the right tag.
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::tag v$TAG does not match package.json version $PKG"
+            exit 1
+          fi
+          echo "publishing $PKG"
+
+      - name: Publish
+        # --access public is required for the first publish of a scoped package:
+        # npm defaults a new @scope/name to restricted and fails without a paid
+        # plan. It is a no-op once the package is public.
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
