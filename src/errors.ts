@@ -44,6 +44,32 @@ export class InsufficientBalanceError extends APIError {}
 export class PaymentError extends JarvisClawError {}
 
 /**
+ * The caller's own approval hook refused the charge, so nothing was signed.
+ *
+ * Distinct from PaymentError (signing broke) and from InsufficientBalanceError (the
+ * wallet cannot cover it): here the money is available and the machinery works, and
+ * the answer was no. Callers show these differently — a declined charge is a
+ * decision to report, not a fault to diagnose or retry.
+ *
+ * Carries the quoted amount so a caller can say what it refused.
+ */
+export class PaymentDeclinedError extends JarvisClawError {
+  readonly amountUsd: number
+  readonly resourceUrl: string
+  readonly reason: string
+
+  constructor(opts: { amountUsd: number; resourceUrl: string; reason: string }) {
+    super(
+      `payment declined: $${opts.amountUsd.toFixed(6)} for ${opts.resourceUrl}` +
+        (opts.reason ? ` — ${opts.reason}` : ''),
+    )
+    this.amountUsd = opts.amountUsd
+    this.resourceUrl = opts.resourceUrl
+    this.reason = opts.reason
+  }
+}
+
+/**
  * The request never produced an HTTP response.
  *
  * Covers DNS failures, refused connections, dropped sockets and aborts. Without

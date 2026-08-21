@@ -17,6 +17,8 @@ export {
   DEFAULT_MAX_RETRIES,
   DEFAULT_TIMEOUT_MS,
   type ClientOptions,
+  type PaymentApprover,
+  type PaymentRequest,
   type RequestOptions,
 } from './client.js'
 
@@ -36,6 +38,7 @@ export {
   ConnectionError,
   InsufficientBalanceError,
   JarvisClawError,
+  PaymentDeclinedError,
   PaymentError,
   RateLimitError,
   TimeoutError,

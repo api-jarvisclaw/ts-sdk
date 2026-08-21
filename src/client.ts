@@ -13,9 +13,12 @@ import {
   ConnectionError,
   InsufficientBalanceError,
   JarvisClawError,
+  PaymentDeclinedError,
+  PaymentError,
   RateLimitError,
   TimeoutError,
 } from './errors.js'
+import { parseChallenge, paymentOptions } from './x402/challenge.js'
 import { USDC_BASE_CONTRACT } from './x402/evm.js'
 import { solanaUsdcBalance } from './x402/solana.js'
 
@@ -24,6 +27,32 @@ export const DEFAULT_TIMEOUT_MS = 120_000
 export const DEFAULT_MAX_RETRIES = 3
 
 const RETRY_STATUS_CODES = new Set([429, 500, 502, 503, 504])
+
+/** What an approval hook is told about a charge before it is signed. */
+export interface PaymentRequest {
+  /** The quoted charge in USD. x402 prepays this exact amount — see approvePayment. */
+  amountUsd: number
+  /** Raw quote in USDC base units, for a caller that needs it undivided. */
+  amountBaseUnits: bigint
+  /** The endpoint being paid for. */
+  resourceUrl: string
+  /** The chain the quote names, e.g. "eip155:8453". */
+  network: string
+  /** The gateway's own description of the resource, when it sent one. */
+  description?: string
+}
+
+/**
+ * Decide one charge. Return false (or a reason) to refuse.
+ *
+ * May be async, so a caller can prompt a human.
+ */
+export type PaymentApprover = (
+  req: PaymentRequest,
+) => boolean | { approved: boolean; reason?: string } | Promise<boolean | { approved: boolean; reason?: string }>
+
+/** USDC has 6 decimals on both chains the SDK supports. */
+const USDC_DECIMALS = 1_000_000
 
 /** How to authenticate, and where. */
 export interface ClientOptions {
@@ -42,6 +71,24 @@ export interface ClientOptions {
    * A client-side circuit breaker, not a budget. Defaults to 100 USDC.
    */
   maxAmountBaseUnits?: bigint
+  /**
+   * Called before signing any x402 payment. Return false to refuse the charge.
+   *
+   * This is the only place that sees EVERY charge. A caller that gates spending at
+   * its own call sites gates only the calls it remembered to wrap: the CLI's
+   * per-call and per-session limits governed its `call_api` tool and nothing else,
+   * so six LLM turns quoted at $0.21 each went through untouched while the user
+   * held a $0.05 per-call limit and a $1 session limit. The most expensive
+   * component was the one outside the gate.
+   *
+   * Receives the quoted amount, which is the amount that will actually be charged:
+   * x402 prepays a fixed authorisation, so there is no later reconciliation to a
+   * smaller number.
+   *
+   * Refusal raises PaymentDeclinedError rather than returning an unpaid response,
+   * so a declined charge cannot be mistaken for a failed request.
+   */
+  approvePayment?: PaymentApprover
   /**
    * Proceed with no credential instead of throwing when none is found.
    *
@@ -76,6 +123,7 @@ export class BaseClient {
   protected readonly timeoutMs: number
   protected readonly maxRetries: number
   protected readonly fetchImpl: typeof fetch
+  protected readonly approvePayment?: PaymentApprover
 
   /**
    * Prefer `create()`. This is public only because `create()` constructs `this`
@@ -87,12 +135,14 @@ export class BaseClient {
     timeoutMs: number
     maxRetries: number
     fetchImpl: typeof fetch
+    approvePayment?: PaymentApprover
   }) {
     this.auth = auth
     this.baseUrl = resolved.baseUrl
     this.timeoutMs = resolved.timeoutMs
     this.maxRetries = resolved.maxRetries
     this.fetchImpl = resolved.fetchImpl
+    if (resolved.approvePayment) this.approvePayment = resolved.approvePayment
   }
 
   /** Build a client, resolving credentials from options then the environment. */
@@ -102,6 +152,7 @@ export class BaseClient {
       timeoutMs: number
       maxRetries: number
       fetchImpl: typeof fetch
+      approvePayment?: PaymentApprover
     }) => T,
     opts: ClientOptions = {},
   ): Promise<T> {
@@ -115,6 +166,7 @@ export class BaseClient {
       timeoutMs: opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
       maxRetries: opts.maxRetries ?? DEFAULT_MAX_RETRIES,
       fetchImpl: opts.fetchImpl ?? fetch,
+      ...(opts.approvePayment ? { approvePayment: opts.approvePayment } : {}),
     })
   }
 
@@ -232,6 +284,16 @@ export class BaseClient {
       )
     }
 
+    // Gate BEFORE signing. A signature is an irrevocable authorisation for a fixed
+    // amount, so this is the last moment a charge can still be refused.
+    //
+    // The clone is required: parseChallenge consumes the body, and the signer needs
+    // it intact afterwards. Reading the original here would leave the signer with an
+    // empty body and turn an approved payment into a signing failure.
+    if (this.approvePayment) {
+      await this.gatePayment(challenge.clone(), url)
+    }
+
     const signature = await this.auth.signPayment(challenge, url)
     if (!signature) {
       const body = await safeJson(challenge)
@@ -239,6 +301,49 @@ export class BaseClient {
     }
 
     return this.send(url, method, encodedBody, opts, { 'PAYMENT-SIGNATURE': signature })
+  }
+
+  /**
+   * Run the caller's approval hook against a 402 quote, throwing if it refuses.
+   *
+   * An unreadable quote is refused rather than waved through. The hook exists to
+   * bound spending, and "we could not tell how much this costs" is not a reason to
+   * pay it — it is the strongest reason not to.
+   */
+  private async gatePayment(challengeCopy: Response, url: string): Promise<void> {
+    let req: PaymentRequest
+    try {
+      const parsed = await parseChallenge(challengeCopy)
+      const option = paymentOptions(parsed)[0]
+      const raw = option?.amount ?? option?.maxAmountRequired
+      if (raw === undefined || raw === null || raw === '') {
+        throw new PaymentError('x402: challenge named no amount')
+      }
+      const amountBaseUnits = BigInt(String(raw))
+      req = {
+        amountUsd: Number(amountBaseUnits) / USDC_DECIMALS,
+        amountBaseUnits,
+        resourceUrl: url,
+        network: option?.network ?? '',
+        ...(parsed.resource?.description ? { description: parsed.resource.description } : {}),
+      }
+    } catch (err) {
+      throw new PaymentDeclinedError({
+        amountUsd: 0,
+        resourceUrl: url,
+        reason: `the quoted amount could not be read (${String(err)}), so it was not paid`,
+      })
+    }
+
+    const verdict = await this.approvePayment!(req)
+    const approved = typeof verdict === 'boolean' ? verdict : verdict.approved
+    if (!approved) {
+      throw new PaymentDeclinedError({
+        amountUsd: req.amountUsd,
+        resourceUrl: url,
+        reason: typeof verdict === 'boolean' ? '' : (verdict.reason ?? ''),
+      })
+    }
   }
 
   private async send(
