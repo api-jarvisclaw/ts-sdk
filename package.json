@@ -1,6 +1,6 @@
 {
   "name": "@jarvisclaw-ai/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript SDK for JarvisClaw — chat, marketplace and AIP, with built-in x402 USDC payments on Base and Solana.",
   "license": "MIT",
   "author": "JarvisClaw",
